@@ -10,28 +10,30 @@ It is also a great opportunity to try out the `supervision` library by [Roboflow
 
 ## Motivation
 
-All I want these models for is data exploration and check what face parts can be seen in an image. Note that I'm talking about detecting _face parts_, which is not the same as detecting _faces_. I've been asked many times: why not using facial landmark detectors? And the reason is that these do not work well with close-up images, like this one:
+All I want these models for is data exploration and check what face parts can be seen in an image. I'm talking about detecting _face parts_, which is not the same as detecting _faces_.
+
+I've been asked many times: why not using facial landmark detectors? And the reason is that these do not work well with close-up images or heavily occluded faces, like this one:
 
 ![An example of a close-up image where facial landmark detection is not possible](images/closeup_example.jpg)
 
 _Image source: [Pexels](https://images.pexels.com/photos/977601/pexels-photo-977601.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1)_
 
-I know there are several works about facial landmark detection for occluded faces (such as ["Robust face landmark estimation under occlusion"](https://pdollar.github.io/files/papers/BurgosArtizzuICCV13rcpr.pdf)), but a picture of the entire face is always needed. If I wanted to be able to detect face parts in close-up images, I would have to develop something new. And that's what I've done.
+I know there are several works about facial landmark detection for occluded faces (such as ["Robust face landmark estimation under occlusion"](https://pdollar.github.io/files/papers/BurgosArtizzuICCV13rcpr.pdf)), but a picture of the entire face is always needed. If I wanted to be able to detect face parts in close-up images, I would have to develop something new. And that's exactly what I've done.
 
 ## Data
 
 For this experiment I'm using a variety of facial landmark detection datasets. Each dataset came in a different structure, so I had to deal with that in `prepare_full_dataset.py`:
 
-- **Existing datasets**: all these datasets were processed by converting each group of facial landmarks (eye, mouth, nose, eyebrows) to a bounding box compatible with YOLO.
+- **Existing datasets**: all these datasets were processed by converting each group of facial landmarks (eye, mouth, nose, eyebrows) to a bounding box in the YOLO format (normalized ``x, y, w, h``).
   - [Helen dataset](http://www.ifp.illinois.edu/~vuongle2/helen/)
   - [Menpo2D dataset](https://github.com/jiankangdeng/MenpoBenchmark)
   - [AFW (Annotated Faces in the Wild) dataset](https://ibug.doc.ic.ac.uk/resources/facial-point-annotations/)
   - [LaPa (Landmark-guided face Parsing) dataset](https://github.com/JDAI-CV/lapa-dataset)
-  - [FASSEG (FAce Semantic SEGmentation) dataset](https://github.com/massimomauro/FASSEG-repository): The original labels consider eyebrows and hair as a single class (hair), so I manually annotated subsets V2 and V3. This dataset includes many low-quality profile images, and it will probably improve performance.
+  - [FASSEG (FAce Semantic SEGmentation) dataset](https://github.com/massimomauro/FASSEG-repository): The original labels have eyebrows and hair in the same class (hair), so I manually annotated subsets V2 and V3 with [CVAT](https://app.cvat.ai/). This dataset adds many low-quality profile images, which probably improves performance.
 - **Custom datasets**:
   - [Pexels](https://pexels.com): I downloaded 257 images from this website and annotated them using [CVAT](https://app.cvat.ai/). As of today, I've annotated four batches of images, and I've tried to include pictures where parts of the face are missing.
 
-**I am not sharing any of these datasets**: they are not mine and they are 100% accessible from their corresponding sites. I may release the Pexels dataset that I create, though.
+⚠ **I am not sharing any of these datasets**: they are not mine, and they are 100% accessible from their corresponding sites. I may release the Pexels dataset that I create in the future, though.
 
 ## Results
 
@@ -43,7 +45,7 @@ Some datasets such as Helen may generate noisy examples when the images have mor
 
 ### Performance
 
-In this section you can see the performance of the _nano_ model. It struggles with eyebrows, but it works really well for eyes and noses. I would need to add more close-up images of each part to increase the number of incomplete or occluded faces.
+In this section you can see the performance of the _nano_ model. It struggles with eyebrows, but it works really well for eyes, mouths, and noses. I would need to add more close-up images of each part to increase the number of incomplete or occluded faces.
 
 ![Yolov8-nano F1 curve](images/F1_curve.png)
 

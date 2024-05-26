@@ -25,15 +25,23 @@ def process_names(names, split, path_data, path_dest, skip=[]):
     """
     This function reads the split data of all datasets
      and saves it following the YOLO folder structure
-    :param names: Dataframe with a single column (the
+    :param names: Dataframe with a single column (the filenames)
     :param split: split name ("val" or "train")
     :param path_data: path to the data
     :param path_dest: path to the exported data
     :param skip: list of image names that we may want to skip
     :return: None
     """
-    names[1] = names[0].apply(lambda x: os.path.join(path_data, "images", x + ".jpg"))
-    names[2] = names[0].apply(lambda x: os.path.join(path_data, "labels", x + ".txt"))
+
+    def fill_img_ext(x, ext):
+        """ I do this because not all the images are JPG (e.g. FASSEG is bmp)"""
+        if len(os.path.splitext(x)[1]) == 0:
+            return os.path.join(path_data, "images", x + ext)
+        else:
+            return os.path.join(path_data, "images", x)
+
+    names[1] = names[0].apply(lambda x: fill_img_ext(x, ".jpg"))
+    names[2] = names[0].apply(lambda x: os.path.join(path_data, "labels", os.path.splitext(x)[0] + ".txt"))
     path_imgs_txt = os.path.join(path_dest, "images", split, "images.txt")
     path_labels_txt = os.path.join(path_dest, "labels", split, "labels.txt")
     use_imgs = names.loc[~names[0].isin(skip), 1]
