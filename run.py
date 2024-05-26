@@ -1,19 +1,20 @@
+"""
+This script runs YOLOv8 to generate a report (CSV) of all detections found in a folder with images
+
+Author: Ignacio Hernández Montilla, 2023
+"""
+
 import os
 from pathlib import Path
 import argparse
 
 import pandas as pd
 from ultralytics import YOLO
-import cv2
 import supervision as spv
 from utils import *
 
 
 if __name__ == "__main__":
-
-    """
-    This script runs YOLOv8 to generate a report (CSV) of all detections found in a folder with images
-    """
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", '--path_model', type=str, help="Path to the model")
