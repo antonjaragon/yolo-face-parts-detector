@@ -29,7 +29,7 @@ For this experiment I'm using a variety of facial landmark detection datasets. E
   - [Menpo2D dataset](https://github.com/jiankangdeng/MenpoBenchmark)
   - [AFW (Annotated Faces in the Wild) dataset](https://ibug.doc.ic.ac.uk/resources/facial-point-annotations/)
   - [LaPa (Landmark-guided face Parsing) dataset](https://github.com/JDAI-CV/lapa-dataset)
-  - [FASSEG (FAce Semantic SEGmentation) dataset](https://github.com/massimomauro/FASSEG-repository): The original labels have eyebrows and hair in the same class (hair), so I manually annotated subsets V2 and V3 with [CVAT](https://app.cvat.ai/). This dataset adds many low-quality profile images, which probably improves performance.
+  - [FASSEG (FAce Semantic SEGmentation) dataset](https://github.com/massimomauro/FASSEG-repository): The original labels have eyebrows and hair in the same `hair` class, so I manually annotated subsets V2 and V3 with [CVAT](https://app.cvat.ai/). This dataset adds many low-quality profile images, which probably improves performance.
 - **Custom datasets**:
   - [Pexels](https://pexels.com): I downloaded 257 images from this website and annotated them using [CVAT](https://app.cvat.ai/). As of today, I've annotated four batches of images, and I've tried to include pictures where parts of the face are missing.
 
