@@ -2,11 +2,13 @@
 
 ## Introduction
 
-In this project I use the most recent implementation of YOLO by Ultralytics, [YOLOv8](https://github.com/ultralytics/ultralytics). The goal is to train an algorithm that is able to detect separate face parts without having to use landmark detectors that don't do well when part of the face is occluded or missing. My goal is to also combine frontal, semi-frontal and profile face datasets so that the YOLO model works well on all of them. 
+In this project I use Ultralytics' implementation of [YOLOv8](https://github.com/ultralytics/ultralytics). The goal is to train an algorithm that is able to detect separate face parts without having to use landmark detectors that don't do well when part of the face is occluded or missing. My goal is to also combine frontal, semi-frontal and profile face datasets so that the YOLO model works well on all of them. 
 
-It is also a great opportunity to try out the `supervision` library by [Roboflow](https://github.com/roboflow/supervision). Despite it's still in beta, it looks really helpful for some common YOLO-related tasks such as drawing the detections.
+It is also a great opportunity to try out the `supervision` library by [Roboflow](https://github.com/roboflow/supervision). It looks really helpful for some common YOLO-related tasks such as drawing the detections.
 
 ![A live demo of YOLOv8 nano](images/live_demo.gif)
+
+This project uses Python 3.11. To install the required packages, use `pip install -r requirements.txt` in a Python 3.11 environment.
 
 ## Motivation
 

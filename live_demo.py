@@ -1,3 +1,9 @@
+"""
+This script loads a YOLO model and runs it on live camera feed
+
+Author: Ignacio Hernández Montilla, 2023
+"""
+
 from pathlib import Path
 import argparse
 import time
@@ -7,79 +13,72 @@ import cv2
 import numpy as np
 import imageio
 import supervision as spv
+from utils import annotate_frame
 
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", '--path_model', type=str, help="Path to the model")
-    parser.add_argument('--save_gif', action="store_true", help="Save the video to a GIF file")
+    parser.add_argument("-i", '--camera_id', type=int, help="Camera ID")
+    parser.add_argument('--save_gif', type=str,
+                        help="Save the video to a GIF file in given location")
     args = parser.parse_args()
-
-    # Debugging
-    # args.path_model = "runs/detect/train_n"
-    # args.save_gif = True
 
     # Loading the model
     try:
+        print("Loading the model")
         path_model = Path(args.path_model)
-        model = YOLO(path_model / "weights" / "best.pt")
+        model = YOLO(path_model)
     except FileNotFoundError:
         print("ERROR: Could not load the YOLO model")
         exit()
 
     # This will draw the detections
     class_colors = spv.ColorPalette.from_hex(['#ffff66', '#66ffcc', '#ff99ff', '#ffcc99'])
-    box_annotator = spv.BoxAnnotator(
-        thickness=2,
-        text_thickness=1,
-        text_scale=0.5,
-        color=class_colors
-    )
+    class_names_dict = model.model.names
+    bbox_annotator = spv.BoundingBoxAnnotator(thickness=2, color=class_colors)
+    label_annotator = spv.LabelAnnotator(color=class_colors, text_color=spv.Color.from_hex("#000000"))
 
     # Reading frames from the webcam
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(args.camera_id)
 
-    # Optional: exporting to GIF
-    if args.save_gif:
-        frames = []
-        times = []
-        path_gif = path_model / "live_demo.gif"
+    # Exporting to GIF
+    frames = []
+    times = []
+    make_gif = args.save_gif is not None
+    if make_gif:
+        if Path(args.save_gif).is_file():
+            path_gif = Path(args.save_gif)
+        else:
+            path_gif = Path(args.save_gif) / "live_demo.gif"
 
+    # Read from camera and run the YOLO model on each frame
     while True:
-        ret, frame = cap.read()
+        frame_ok, frame = cap.read()
 
-        start_time = time.time()
-        result = model(frame, agnostic_nms=True, verbose=False)[0]
-        detections = spv.Detections.from_yolov8(result)
+        if frame_ok:
+            start_time = time.time()
+            result = model(frame, agnostic_nms=True, verbose=False)[0]
+            detections = spv.Detections.from_ultralytics(result)
 
-        labels = [
-            f"{model.model.names[class_id]} {confidence:0.2f}"
-            for _, confidence, class_id, _
-            in detections
-        ]
-        frame = box_annotator.annotate(
-            scene=frame,
-            detections=detections,
-            labels=labels
-        )
+            frame = annotate_frame(frame, detections, bbox_annotator, label_annotator, class_names_dict)
+            cv2.imshow("Face parts", frame)
+            k = cv2.waitKey(1)
 
-        cv2.imshow("Face parts", frame)
-        k = cv2.waitKey(1)
+            if make_gif:
+                frames.append(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+                times.append(time.time() - start_time)
 
-        if args.save_gif:
-            frames.append(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-            times.append(time.time() - start_time)
-
-        if k == ord("q"):
-            break
+            if k == ord("q"):
+                break
 
     cv2.destroyAllWindows()
     cap.release()
 
     # Exporting to GIF
     # Source: https://pysource.com/2021/03/25/create-an-animated-gif-in-real-time-with-opencv-and-python/
-    if args.save_gif:
+    if make_gif:
         print("\nSaving the stream to ", path_gif)
         avg_time = np.array(times).mean()
         fps = round(1 / avg_time)

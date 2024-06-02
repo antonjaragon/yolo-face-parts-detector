@@ -27,7 +27,7 @@ if __name__ == "__main__":
     # Loading the model
     try:
         path_model = Path(args.path_model)
-        model = YOLO(path_model / "weights" / "best.pt")
+        model = YOLO(path_model)
     except FileNotFoundError:
         print("ERROR: Could not load the YOLO model")
         exit()
@@ -39,36 +39,24 @@ if __name__ == "__main__":
         path_report = path_output / "report.csv"
         report = pd.DataFrame(columns=['image_name', 'detection', 'x1', 'y1', 'x2', 'y2'])
 
-        if args.show:
-            class_colors = spv.ColorPalette.from_hex(['#ffff66', '#66ffcc', '#ff99ff', '#ffcc99'])
-            box_annotator = spv.BoxAnnotator(
-                thickness=2,
-                text_thickness=1,
-                text_scale=0.5,
-                color=class_colors
-            )
+        class_colors = spv.ColorPalette.from_hex(['#ffff66', '#66ffcc', '#ff99ff', '#ffcc99'])
+        class_names_dict = model.model.names
+        bbox_annotator = spv.BoundingBoxAnnotator(thickness=2, color=class_colors)
+        label_annotator = spv.LabelAnnotator(color=class_colors, text_color=spv.Color.from_hex("#000000"))
 
         for f in os.listdir(args.path_data):
             img = cv2.imread(os.path.join(args.path_data, f))
             img, _ = smart_resize(img, new_size=640)
             result = model(img, agnostic_nms=True, verbose=False)[0]
-            detections = spv.Detections.from_yolov8(result)
+            detections = spv.Detections.from_ultralytics(result)
+
             for i, bbox in enumerate(detections.xyxy):
                 x1, y1, x2, y2 = bbox.astype(int)
-                label = model.model.names[detections.class_id[i]]
+                label = class_names_dict[detections.class_id[i]]
                 report.loc[len(report), :] = [f, label, x1, y1, x2, y2]
-            if args.show:
-                labels = [
-                    f"{model.model.names[class_id]} {confidence:0.2f}"
-                    for _, confidence, class_id, _
-                    in detections
-                ]
-                frame = box_annotator.annotate(
-                    scene=img,
-                    detections=detections,
-                    labels=labels
-                )
 
+            if args.show:
+                img = annotate_frame(img, detections, bbox_annotator, label_annotator, class_names_dict)
                 cv2.imshow("Face parts", img)
                 k = cv2.waitKey(args.frame_time)
 
