@@ -1,5 +1,9 @@
 # Face parts detection with YOLOv8 🎯
 
+If you find my work useful, please cite it as:
+
+> Hernández Montilla, I (2024) Face parts detection with YOLOv8, DOI: https://doi.org/10.5281/zenodo.12507625
+
 ## Introduction
 
 In this project I use Ultralytics' implementation of [YOLOv8](https://github.com/ultralytics/ultralytics). The goal is to train an algorithm that is able to detect separate face parts without having to use landmark detectors that don't do well when part of the face is occluded or missing. My goal is to also combine frontal, semi-frontal and profile face datasets so that the YOLO model works well on all of them. 
