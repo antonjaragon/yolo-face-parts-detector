@@ -2,3 +2,8 @@
 runs/
 weights/
 __pycache__/
+
+images/frame_filmato0/
+images/eyes_crop/
+
+*.avi

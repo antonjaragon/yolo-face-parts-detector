@@ -37,7 +37,7 @@ if __name__ == "__main__":
     # This will draw the detections
     class_colors = spv.ColorPalette.from_hex(['#ffff66', '#66ffcc', '#ff99ff', '#ffcc99'])
     class_names_dict = model.model.names
-    bbox_annotator = spv.BoundingBoxAnnotator(thickness=2, color=class_colors)
+    bbox_annotator = spv.BoxAnnotator(thickness=2, color=class_colors)
     label_annotator = spv.LabelAnnotator(color=class_colors, text_color=spv.Color.from_hex("#000000"))
 
     # Reading frames from the webcam
